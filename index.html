@@ -194,7 +194,7 @@ footer {
       <div class="price-table">
         <p>100 = ₹49</p>
         <p>200 = ₹100</p>
-        <p>500 = ₹669</p>
+        <p>500 = ₹100</p>
         <p>1000 = ₹1250</p>
         <p>1500–50000 = ₹4500</p>
       </div>
@@ -285,7 +285,8 @@ function updatePrice() {
   let price = 0;
   if (qty >= 100 && qty < 200) price = 49;
   else if (qty >= 200 && qty < 500) price = 100;
-  else if (qty >= 500 && qty < 1000) price = 669;
+  else if (qty >= 600 && qty < 1000) price = 669;
+      else if (qty >= 500 && qty < 501) price = 100;
   else if (qty >= 1000 && qty < 1500) price = 1250;
   else if (qty >= 1500 && qty <= 50000) price = 4500;
   else price = 0;
