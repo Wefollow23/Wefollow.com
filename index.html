@@ -1,317 +1,225 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>We Follow</title>
-<style>
-:root {
-  --saffron: #ff9933;
-  --white: #ffffff;
-  --green: #138808;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>We're Improving — Coming Soon</title>
+  <style>
+    :root{
+      --bg1:#0f172a; /* deep indigo */
+      --bg2:#061121; /* deep teal */
+      --accent:#5eead4; /* mint */
+      --muted:#94a3b8;
+      --card:#0b1220;
+      --glass: rgba(255,255,255,0.04);
+      --radius:16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background: linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:#e6eef6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px;
 }
 
-/* GLOBAL STYLE */
-body {
-  margin: 0;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, var(--saffron), var(--white), var(--green));
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  overflow-x: hidden;
+.wrap{
+  width:100%;
+  max-width:980px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:var(--radius);
+  padding:28px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+  border:1px solid rgba(255,255,255,0.03);
+  position:relative;
+  overflow:hidden;
+  backdrop-filter: blur(6px);
 }
 
-/* HEADER */
-header {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  background: rgba(0,0,0,0.85);
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 15px;
-  z-index: 10;
-  font-family: 'Brush Script MT', cursive;
+/* animated floating gradient */
+.wrap::before{
+  content:'';
+  position:absolute;
+  inset:-40%;
+  background: radial-gradient(circle at 10% 20%, rgba(94,234,212,0.06), transparent 8%), radial-gradient(circle at 90% 80%, rgba(99,102,241,0.06), transparent 10%);
+  animation: float 12s linear infinite;
+  pointer-events:none;
 }
-.logo {
-  text-shadow: 2px 2px var(--saffron);
-  font-size: 1.5rem;
-}
-.clock {
-  font-family: monospace;
-  font-size: 1rem;
-}
-.hamburger {
-  font-size: 1.8rem;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.3s;
-}
-.hamburger:hover { transform: scale(1.2); }
+@keyframes float{from{transform:translateY(0) rotate(0deg)} to{transform:translateY(-6%) rotate(360deg)}}
 
-/* SIDE MENU */
-.sidemenu {
-  position: fixed; top: 0; right: -280px;
-  width: 260px; height: 100%;
-  background: rgba(0,0,0,0.95);
-  color: white;
-  display: flex; flex-direction: column; align-items: center;
-  padding: 25px 15px;
-  transition: right 0.4s ease;
-  z-index: 11;
+header{display:flex;gap:20px;align-items:center}
+.logo{
+  width:76px;height:76px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:#042027;font-size:22px;box-shadow: 0 6px 18px rgba(16,24,40,0.5);
+  transform:translateY(-6px);
+  animation: pop .9s cubic-bezier(.2,.9,.2,1) both;
 }
-.sidemenu.open { right: 0; }
-.sidemenu .close-btn { font-size: 1.5rem; align-self: flex-end; cursor: pointer; margin-bottom: 40px; }
-.sidemenu a {
-  color: white; text-decoration: none; font-size: 1.1rem;
-  padding: 10px 20px; margin: 10px; border-radius: 30px;
-  background: var(--saffron); transition: all 0.3s ease;
-}
-.sidemenu a:hover { background: var(--green); transform: scale(1.05); }
+@keyframes pop{from{transform:scale(.85) translateY(0)} to{transform:scale(1) translateY(-6px)}}
 
-/* MAIN FORM */
-main {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 120px;
-  margin-bottom: 90px;
-  padding: 15px;
+h1{margin:0;font-size:28px;letter-spacing:-0.4px}
+p.lead{margin:8px 0 0;color:var(--muted);line-height:1.45}
+
+.content{
+  display:grid;grid-template-columns:1fr 360px;gap:20px;margin-top:20px;align-items:start;
 }
 
-.form-step {
-  display: none;
-  text-align: center;
-  background: rgba(255,255,255,0.95);
-  padding: 25px 20px;
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  width: 100%;
-  max-width: 380px;
-  animation: fadeSlide 0.8s ease;
-}
-@keyframes fadeSlide {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.form-step.active { display: block; }
+.card{background:var(--card);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
 
-input, button {
-  width: 90%;
-  padding: 12px;
-  border: none;
-  border-radius: 25px;
-  margin: 10px 0;
-  font-size: 1rem;
-  outline: none;
-  transition: all 0.3s ease;
+.changes{display:flex;flex-direction:column;gap:12px}
+.change{
+  display:flex;gap:14px;align-items:flex-start;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  transition:transform .28s ease, box-shadow .28s ease;
 }
-input:focus { box-shadow: 0 0 10px var(--green); }
-button {
-  background: var(--green); color: white; cursor: pointer; font-weight: bold;
+.change:hover{transform:translateY(-6px);box-shadow:0 10px 30px rgba(2,6,23,0.5)}
+.icon{
+  min-width:44px;height:44px;border-radius:10px;background:var(--glass);display:grid;place-items:center;font-weight:700;color:var(--accent);font-size:18px;border:1px solid rgba(255,255,255,0.03)
 }
-button:hover { background: var(--saffron); transform: scale(1.05); }
+.chg-title{font-weight:600;margin:0}
+.chg-desc{margin:4px 0 0;color:var(--muted);font-size:14px}
 
-.price-table {
-  text-align: left;
-  background: rgba(255,255,255,0.8);
-  padding: 15px;
-  border-radius: 15px;
-  margin-top: 10px;
-  font-weight: 600;
-  font-size: 0.9rem;
+/* right column */
+.right{
+  display:flex;flex-direction:column;gap:12px;position:relative
 }
 
-#estimatedPrice {
-  font-weight: bold;
-  color: var(--green);
-  font-size: 1.2rem;
-  margin-top: 10px;
+.count{
+  font-size:42px;font-weight:700;text-align:center;padding:20px 12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:12px
 }
 
-/* POPUP */
-.popup {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 20;
-}
-.popup-content {
-  background: white;
-  padding: 25px 30px;
-  border-radius: 15px;
-  text-align: center;
-  animation: fadeSlide 0.8s ease;
+.notify{display:flex;gap:8px;align-items:center}
+.email{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+.btn{
+  padding:10px 14px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),#7c3aed);color:#001219;font-weight:700;cursor:pointer
 }
 
-/* FOOTER */
-footer {
-  background: rgba(0,0,0,0.9);
-  color: rgb(255, 0, 255);
-  text-align: center;
-  font-family: "Brush Script MT", cursive;
-  font-size: 1.2rem;
-  padding: 10px;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
+footer{margin-top:18px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.03);display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}
+
+.tagline{display:flex;gap:8px;align-items:center}
+.year{font-weight:700;color:var(--accent);background:rgba(94,234,212,0.04);padding:6px 10px;border-radius:8px}
+
+/* subtle entrance */
+.card, .right > *{opacity:0;transform:translateY(8px);animation:fadeIn .7s cubic-bezier(.2,.9,.2,1) forwards}
+.card{animation-delay:.18s}
+.changes .change:nth-child(1){animation-delay:.25s}
+.changes .change:nth-child(2){animation-delay:.32s}
+.changes .change:nth-child(3){animation-delay:.39s}
+.changes .change:nth-child(4){animation-delay:.46s}
+.count{animation-delay:.28s}
+.notify{animation-delay:.36s}
+
+@keyframes fadeIn{to{opacity:1;transform:none}}
+
+/* responsive */
+@media (max-width:880px){
+  .content{grid-template-columns:1fr;}
+  .right{order:2}
 }
-</style>
+
+  </style>
 </head>
-
 <body>
-
-<header>
-  <div class="logo">We Follow</div>
-  <div class="clock" id="clock">--:--:--</div>
-  <div class="hamburger" onclick="toggleMenu()">☰</div>
-</header>
-
-<!-- MAIN FORM -->
-<main>
-  <form id="followForm" action="https://formspree.io/f/mpwkardw" method="POST">
-
-    <!-- STEP 1 -->
-    <div class="form-step active" id="step1">
-      <h2>Enter Your Instagram Username</h2>
-      <input type="text" id="username" name="username" placeholder="@yourusername" required>
-      <button type="button" onclick="goToStep(2)">Next</button>
-    </div>
-
-    <!-- STEP 2 -->
-    <div class="form-step" id="step2">
-      <h2>Select Quantity</h2>
-      <input type="number" id="qty" name="quantity" placeholder="Enter quantity (100–50000)" required oninput="updatePrice()">
-      <div id="estimatedPrice">Estimated Price: ₹0</div>
-      <div class="price-table">
-        <p>100 = ₹49</p>
-        <p>200 = ₹100</p>
-        <p>500 = ₹310</p>
-        <p>1000 = ₹1250</p>
-        <p>1500–50000 = ₹4500</p>
+  <div class="wrap">
+    <header>
+      <div class="logo" aria-hidden>W</div>
+      <div>
+        <h1>We’re making a huge change — back very soon</h1>
+        <p class="lead">We’re rebuilding our experience from the ground up with fresh design, improved pricing and clearer processes. During this time the site may be limited — thanks for your patience.</p>
       </div>
-      <button type="button" onclick="goToStep(3)">Next</button>
+    </header><div class="content">
+  <section class="card">
+    <h3 style="margin:0 0 12px">What will change after the update</h3>
+    <div class="changes">
+      <div class="change">
+        <div class="icon">₹</div>
+        <div>
+          <p class="chg-title">Prices — clearer & fair</p>
+          <p class="chg-desc">Pricing will be simplified with transparent tiers, clearer discounts and improved checkout calculations.</p>
+        </div>
+      </div>
+
+      <div class="change">
+        <div class="icon">UI</div>
+        <div>
+          <p class="chg-title">UI — modern & accessible</p>
+          <p class="chg-desc">A refreshed user interface with improved accessibility, faster navigation and consistent visual language.</p>
+        </div>
+      </div>
+
+      <div class="change">
+        <div class="icon">🎨</div>
+        <div>
+          <p class="chg-title">Theme — unified brand look</p>
+          <p class="chg-desc">A cohesive theme across the product — typography, color system and components will be standardized.</p>
+        </div>
+      </div>
+
+      <div class="change">
+        <div class="icon">⚙️</div>
+        <div>
+          <p class="chg-title">Process — faster & clearer</p>
+          <p class="chg-desc">Improved internal processes and customer flows — from onboarding to order tracking and support.</p>
+        </div>
+      </div>
+
+      <div class="change">
+        <div class="icon">➕</div>
+        <div>
+          <p class="chg-title">New sections</p>
+          <p class="chg-desc">We’ll add new sections such as Tutorials, Resources, and a dedicated Help Center to help you get more value.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="right">
+    <div class="card">
+      <div class="count">Coming Soon</div>
+      <p style="margin:8px 0 0;color:var(--muted);font-size:14px">Want to be notified when we go live? Leave your email and we’ll send a short announcement with highlights.</p>
+      <div style="height:12px"></div>
+      <div class="notify">
+        <input class="email" type="email" placeholder="Your email address" aria-label="email" />
+        <button class="btn">Notify me</button>
+      </div>
     </div>
 
-    <!-- STEP 3 -->
-    <div class="form-step" id="step3">
-      <h2>Choose Payment Option</h2>
-      <p style="font-size:0.9rem;color:#444;padding:10px;">
-        <b>Note:</b> Please ensure your redeem code value matches the selected plan.
-        Redeems of lesser value will not be accepted, and partial refunds are not provided.
-      </p>
-      <button type="button" onclick="manualPay()">Pay Manually (Instagram)</button>
-      <button type="button" onclick="goToStep(4)">Use Redeem Code</button>
+    <div class="card" style="display:flex;flex-direction:column;gap:8px">
+      <strong style="font-size:14px;margin-bottom:6px">Design preview</strong>
+      <div style="height:80px;border-radius:8px;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);display:grid;place-items:center;color:var(--muted)">Animated theme & micro-interactions</div>
     </div>
-
-    <!-- STEP 4 -->
-    <div class="form-step" id="step4">
-      <h2>Redeem Code</h2>
-      <input type="text" id="redeem" name="redeem" placeholder="8–16 character code" maxlength="16">
-      <input type="email" id="email" name="email" placeholder="Your Gmail">
-      <button type="button" onclick="verifyRedeem()">Submit</button>
-    </div>
-
-  </form>
-</main>
-
-<footer>Website developed by Apk Raja 💫</footer>
-
-<!-- POPUP -->
-<div class="popup" id="welcomePopup">
-  <div class="popup-content">
-    <h2>Welcome to We Follow!</h2>
-    <p>Grow your followers instantly 🚀<br> prices will get increased by tomorrow 21Nov2025 at 12am </p>
-    <button onclick="closePopup()">Continue to website
-  </div>
+  </aside>
 </div>
 
-<script>
-// Popup close
-function closePopup() {
-  document.getElementById("welcomePopup").style.display = "none";
-}
+<footer>
+  <div class="tagline">
+    <div style="font-weight:700">We follow</div>
+    <div class="year">2019-25</div>
+  </div>
 
-// Hamburger toggle
-function toggleMenu() {
-  document.getElementById("menu").classList.toggle("open");
-}
+  <div style="font-size:13px;color:var(--muted)">© <span id="yr"></span> Your Company. All rights reserved.</div>
+</footer>
 
-// Live Clock
-function updateClock() {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString();
-  document.getElementById("clock").textContent = timeStr;
-}
-setInterval(updateClock, 1000);
-updateClock();
+  </div>  <script>
+    // small script: set current year and simple micro-interaction
+    document.getElementById('yr').textContent = new Date().getFullYear();
 
-// Step navigation
-function goToStep(step) {
-  const username = document.getElementById("username").value.trim();
-  if (step === 2 && !username.startsWith("@")) {
-    alert("Username must start with '@'.");
-    return;
-  }
-
-  const qty = document.getElementById("qty").value;
-  if (step === 3 && (qty < 100 || qty > 50000)) {
-    alert("Please enter a quantity between 100 and 50000.");
-    return;
-  }
-
-  document.querySelectorAll(".form-step").forEach(s => s.classList.remove("active"));
-  document.getElementById("step" + step).classList.add("active");
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-// Manual pay
-function manualPay() {
-  alert("You must complete your purchase manually on Instagram.");
-  window.open("https://www.instagram.com/urbro.pathan", "_blank");
-}
-
-// Live Price Calculator (fixed)
-function updatePrice() {
-  const qty = parseInt(document.getElementById("qty").value);
-  let price = 0;
-  if (qty >= 100 && qty < 200) price = 49;
-  else if (qty >= 200 && qty < 500) price = 100;
-  else if (qty >= 600 && qty < 1000) price = 669;
-      else if (qty >= 500 && qty < 501) price = 310;
-  else if (qty >= 1000 && qty < 1500) price = 1250;
-  else if (qty >= 1500 && qty <= 50000) price = 4500;
-  else price = 0;
-  document.getElementById("estimatedPrice").innerText = "Estimated Price: ₹" + price;
-}
-
-// Redeem verification
-function verifyRedeem() {
-  const code = document.getElementById("redeem").value.trim();
-  const email = document.getElementById("email").value.trim();
-
-  if (code.length < 8 || code.length > 16) {
-    alert("Redeem code must be 8–16 characters long.");
-    return;
-  }
-
-  if (!email.endsWith("@gmail.com")) {
-    alert("Please enter a valid Gmail address.");
-    return;
-  }
-
-  alert("✅ Redeem code under verification! Submitting form...");
-  document.getElementById("followForm").submit();
-}
-</script>
-
-</body>
+    // basic notify button behaviour (no backend) — graceful UI feedback
+    const btn = document.querySelector('.btn');
+    const email = document.querySelector('.email');
+    btn.addEventListener('click', ()=>{
+      const val = email.value.trim();
+      if(!val || !val.includes('@')){
+        btn.textContent = 'Enter valid email';
+        setTimeout(()=> btn.textContent = 'Notify me',1500);
+        return;
+      }
+      btn.textContent = 'Thanks — saved';
+      setTimeout(()=> btn.textContent = 'Notify me',2200);
+      email.value='';
+    })
+  </script></body>
 </html>
