@@ -6,6 +6,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>We're Improving — Coming Soon</title>
   <style>
+    /* Enhanced colors and animations */
+    :root{
+      --bg1:#ff00cc;
+      --bg2:#333399;
+      --accent:#ffee00;
+      --secondary:#00ffcc;
+    }
+    body{
+      animation: gradientShift 8s ease infinite;
+    }
+    @keyframes gradientShift{
+      0%{background:linear-gradient(135deg,var(--bg1),var(--bg2))}
+      50%{background:linear-gradient(135deg,var(--secondary),var(--bg1))}
+      100%{background:linear-gradient(135deg,var(--bg1),var(--bg2))}
+    }
+    .logo{
+      animation: spinLogo 4s linear infinite;
+    }
+    @keyframes spinLogo{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    .change:hover{
+      animation: pulse 0.8s infinite;
+    }
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
     :root{
       --bg1:#0f172a; /* deep indigo */
       --bg2:#061121; /* deep teal */
