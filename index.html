@@ -3,15 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Viewer</title>
-    <!-- Firebase v10 Modular SDK -->
+    <title>Live Group Chat - Firebase Powered</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .floating-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120,119,198,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,119,198,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120,219,255,0.3) 0%, transparent 50%);
+            animation: bgShift 8s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes bgShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .chat-header {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            padding: 20px 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .chat-title {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+            margin-bottom: 5px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .user-info {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(78,205,196,0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(78,205,196,0); }
+            100% { box-shadow: 0 0 0 0 rgba(78,205,196,0); }
+        }
+
+        /* Messages Area */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            animation: slideInRight 0.4s ease-out;
+            max-width: 80%;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message.own {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .message-bubble {
+            max-width: 100%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .message.other .message-bubble {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.own .message-bubble {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .message-sender {
+            font-weight: bold;
+        }
+
+        .message-time {
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 20px;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        /* Input Area */
+        .input-area {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            padding: 25px 30px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        #nameInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.9);
+            font-size: 16px;
+            outline: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        #nameInput:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: white;
+        }
+
+        #messageInput {
+            flex: 2;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.9);
+            font-size: 16px;
+            outline: none;
+            resize: none;
+            height: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        #messageInput:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: white;
+            height: 60px;
+        }
+
+        #sendBtn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #4ecdc4, #44bdad);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(78,205,196,0.4);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #sendBtn:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(78,205,196,0.6);
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chat-title { font-size: 2em; }
+            .input-area { padding: 20px; flex-direction: column; gap: 10px; }
+            #messageInput, #nameInput { height: 45px; }
+            #sendBtn { width: 100%; height: 50px; }
+            .message { max-width: 95%; }
+        }
+
+        /* Scrollbar */
+        .messages-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-area::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .messages-area::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-bg"></div>
+    
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-title">
+                <i class="fas fa-comments"></i> Live Group Chat
+            </div>
+            <div class="user-info" id="userInfo">
+                <div class="status-dot"></div>
+                Enter your name to start chatting...
+            </div>
+        </div>
+
+        <div class="messages-area" id="messagesArea">
+            <div style="text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">
+                <i class="fas fa-message-slash" style="font-size: 4em; margin-bottom: 20px; opacity: 0.5;"></i>
+                <p>Enter your name and start the conversation!</p>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="nameInput" placeholder="👤 Enter your name..." maxlength="20">
+            <textarea id="messageInput" placeholder="💬 Type your message..." disabled></textarea>
+            <button id="sendBtn" disabled>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
-        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
-        
-        // Your Firebase Config
-        window.firebaseConfig = {
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
+        import { getDatabase, ref, push, onValue, serverTimestamp, query, limitToLast } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js';
+        import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js';
+
+        // Your Firebase config
+        const firebaseConfig = {
             apiKey: "AIzaSyCj0PffLL4gjLEcndJwD-guceGVdQCEh_w",
             authDomain: "wefollow-789a9.firebaseapp.com",
             databaseURL: "https://wefollow-789a9-default-rtdb.firebaseio.com",
@@ -21,243 +333,172 @@
             appId: "1:975020938711:web:d89224ad5fa2eb0fdf2792",
             measurementId: "G-F0Q00Z1RSP"
         };
-        
-        // Initialize Firebase globally
-        window.app = initializeApp(window.firebaseConfig);
-        window.db = getFirestore(window.app);
-        window.storage = getStorage(window.app);
-    </script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .admin-panel { background: #f5f5f5; padding: 20px; border-radius: 10px; margin-bottom: 30px; display: none; }
-        .admin-panel.show { display: block; }
-        input, button { padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
-        button { background: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        .password-input { width: 250px; }
-        .file-input { width: 100%; }
-        .documents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .document-card { border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center; }
-        .document-card img { max-width: 100%; max-height: 200px; border-radius: 5px; object-fit: cover; }
-        .document-card object { width: 100%; height: 400px; border-radius: 5px; }
-        .document-title { font-weight: bold; margin: 10px 0; color: #333; }
-        .upload-status { margin-top: 10px; padding: 10px; border-radius: 5px; display: none; }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .admin-toggle { position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 10px 15px; border-radius: 25px; cursor: pointer; z-index: 1000; font-weight: bold; }
-        .admin-toggle:hover { background: #218838; }
-        .loading { text-align: center; padding: 40px; font-style: italic; color: #666; }
-    </style>
-</head>
-<body>
-    <!-- Admin Toggle Button -->
-    <div class="admin-toggle" onclick="toggleAdminPanel()">Admin Panel</div>
 
-    <!-- Admin Upload Panel -->
-    <div class="admin-panel" id="adminPanel">
-        <h2>🔐 Admin Upload</h2>
-        <input type="password" id="adminPassword" class="password-input" placeholder="Enter password: aariz@2012">
-        <br>
-        <input type="file" id="fileInput" class="file-input" accept="image/*,.pdf">
-        <br>
-        <input type="text" id="fileTitle" placeholder="Document Title (optional)">
-        <br>
-        <button id="uploadBtn" onclick="uploadFile()" disabled>Upload Document</button>
-        <div id="uploadStatus" class="upload-status"></div>
-    </div>
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const analytics = getAnalytics(app);
 
-    <!-- Documents Display -->
-    <h1>📄 Documents</h1>
-    <div id="documentsGrid" class="documents-grid">
-        <div class="loading">Loading documents...</div>
-    </div>
+        // DOM Elements
+        const nameInput = document.getElementById('nameInput');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messagesArea = document.getElementById('messagesArea');
+        const userInfo = document.getElementById('userInfo');
 
-    <script type="module">
-        import { collection, addDoc, query, orderBy, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
-        import { ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
+        let currentUser = '';
+        let isTyping = false;
+        let typingUsers = new Set();
 
-        const ADMIN_PASSWORD = 'aariz@2012';
-        const adminPanel = document.getElementById('adminPanel');
-        const passwordInput = document.getElementById('adminPassword');
-        const fileInput = document.getElementById('fileInput');
-        const fileTitleInput = document.getElementById('fileTitle');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const uploadStatus = document.getElementById('uploadStatus');
-        const documentsGrid = document.getElementById('documentsGrid');
+        // Messages reference
+        const messagesRef = ref(db, 'messages');
+        const typingRef = ref(db, 'typing');
 
-        let isPasswordCorrect = false;
+        // Name Input Handler
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                setUsername();
+            }
+        });
 
-        // Toggle Admin Panel
-        window.toggleAdminPanel = function() {
-            adminPanel.classList.toggle('show');
-            if (adminPanel.classList.contains('show')) {
-                passwordInput.focus();
+        function setUsername() {
+            const name = nameInput.value.trim();
+            if (name) {
+                currentUser = name;
+                nameInput.disabled = true;
+                nameInput.style.opacity = '0.5';
+                messageInput.disabled = false;
+                sendBtn.disabled = false;
+                userInfo.innerHTML = `
+                    <div class="status-dot"></div>
+                    Online as <strong>${currentUser}</strong>
+                `;
+                messageInput.focus();
+                nameInput.blur();
             }
         }
 
-        // Check Password
-        function checkPassword() {
-            if (passwordInput.value === ADMIN_PASSWORD) {
-                isPasswordCorrect = true;
-                showStatus('✅ Password correct! You can now upload files.', 'success');
-                passwordInput.style.borderColor = '#28a745';
-                uploadBtn.disabled = false;
-                return true;
-            } else {
-                isPasswordCorrect = false;
-                showStatus('❌ Incorrect password!', 'error');
-                passwordInput.style.borderColor = '#dc3545';
-                uploadBtn.disabled = true;
-                return false;
+        // Send Message
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
             }
-        }
+        });
 
-        // Show Status Message
-        function showStatus(message, type) {
-            uploadStatus.textContent = message;
-            uploadStatus.className = `upload-status ${type}`;
-            uploadStatus.style.display = 'block';
-            setTimeout(() => {
-                uploadStatus.style.display = 'none';
-            }, 4000);
-        }
-
-        // Upload File
-        window.uploadFile = async function() {
-            if (!isPasswordCorrect) {
-                checkPassword();
-                return;
-            }
-
-            const file = fileInput.files[0];
-            if (!file) {
-                showStatus('Please select a file first!', 'error');
-                return;
-            }
-
-            if (file.size > 20 * 1024 * 1024) { // 20MB limit
-                showStatus('File too large! Max 20MB', 'error');
-                return;
-            }
-
-            const title = fileTitleInput.value || file.name;
-            const fileExt = file.name.split('.').pop().toLowerCase();
-            const isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(fileExt);
-            const timestamp = Date.now();
-
-            uploadBtn.disabled = true;
-            uploadBtn.textContent = 'Uploading...';
-
-            try {
-                showStatus('📤 Uploading file...', 'success');
-                
-                // Upload to Storage
-                const storageReference = storageRef(window.storage, `documents/${timestamp}_${file.name}`);
-                await uploadBytes(storageReference, file);
-                const downloadURL = await getDownloadURL(storageReference);
-
-                // Save metadata to Firestore
-                await addDoc(collection(window.db, 'documents'), {
-                    title: title,
-                    url: downloadURL,
-                    type: isImage ? 'image' : 'pdf',
-                    filename: file.name,
-                    uploadedAt: serverTimestamp(),
-                    size: file.size,
-                    timestamp: timestamp
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message && currentUser) {
+                push(messagesRef, {
+                    sender: currentUser,
+                    message: message,
+                    timestamp: serverTimestamp(),
+                    isOwn: true
                 });
-
-                showStatus('🎉 File uploaded successfully!', 'success');
-                fileInput.value = '';
-                fileTitleInput.value = '';
-                loadDocuments();
-
-            } catch (error) {
-                console.error('Upload failed:', error);
-                showStatus('❌ Upload failed: ' + error.message, 'error');
-            } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.textContent = 'Upload Document';
+                messageInput.value = '';
             }
         }
 
-        // Load and Display Documents
-        window.loadDocuments = async function() {
-            try {
-                documentsGrid.innerHTML = '<div class="loading">Loading documents...</div>';
-                
-                const q = query(collection(window.db, 'documents'), orderBy('timestamp', 'desc'));
-                const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) {
-                    documentsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">No documents uploaded yet.</div>';
-                    return;
-                }
-
-                documentsGrid.innerHTML = '';
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const card = createDocumentCard(data);
-                    documentsGrid.appendChild(card);
+        // Listen for new messages
+        onValue(query(messagesRef, limitToLast(100)), (snapshot) => {
+            messagesArea.innerHTML = '';
+            const messages = snapshot.val();
+            
+            if (messages) {
+                Object.entries(messages).forEach(([key, msg]) => {
+                    if (msg) {
+                        addMessage(msg.sender, msg.message, msg.timestamp);
+                    }
                 });
+            }
+            
+            scrollToBottom();
+        });
 
-            } catch (error) {
-                console.error('Error loading documents:', error);
-                documentsGrid.innerHTML = '<div class="loading" style="color: #dc3545;">Error loading documents. Please refresh.</div>';
+        // Typing indicator
+        messageInput.addEventListener('input', () => {
+            if (currentUser) {
+                if (messageInput.value.trim().length > 0 && !isTyping) {
+                    isTyping = true;
+                    push(typingRef, {
+                        user: currentUser,
+                        timestamp: Date.now()
+                    });
+                } else if (messageInput.value.trim() === '' && isTyping) {
+                    isTyping = false;
+                }
+            }
+        });
+
+        // Listen for typing users
+        onValue(typingRef, (snapshot) => {
+            typingUsers.clear();
+            const typingData = snapshot.val();
+            if (typingData) {
+                Object.values(typingData).forEach(userData => {
+                    if (Date.now() - userData.timestamp < 2000) {
+                        typingUsers.add(userData.user);
+                    }
+                });
+            }
+            updateTypingIndicator();
+        });
+
+        function updateTypingIndicator() {
+            const typingDiv = document.querySelector('.typing-indicator');
+            if (typingUsers.size > 0 && !typingUsers.has(currentUser)) {
+                if (!typingDiv) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'typing-indicator';
+                    indicator.innerHTML = `
+                        ${Array.from(typingUsers).slice(0, 2).join(', ')}${typingUsers.size > 2 ? ' + ' + (typingUsers.size - 2) + ' more' : ''} is typing...
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    `;
+                    messagesArea.appendChild(indicator);
+                    scrollToBottom();
+                }
+            } else if (typingDiv) {
+                typingDiv.remove();
             }
         }
 
-        // Create Document Card
-        function createDocumentCard(data) {
-            const card = document.createElement('div');
-            card.className = 'document-card';
-
-            card.innerHTML = `
-                <div class="document-title">${data.title || data.filename}</div>
-                ${data.type === 'image' ? 
-                    `<img src="${data.url}" alt="${data.title}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"><p style="display:none;">Image failed to load</p>` :
-                    `<object data="${data.url}#view=FitH&scrollbar=0" type="application/pdf" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                        <p style="display:none;"><a href="${data.url}" target="_blank">📥 Download PDF</a></p>
-                    </object>`
-                }
-                <div style="margin-top: 10px; font-size: 12px; color: #666;">
-                    ${formatFileSize(data.size)} • ${data.filename}
+        function addMessage(sender, message, timestamp) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${currentUser === sender ? 'own' : 'other'}`;
+            
+            const time = timestamp ? new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    <div class="message-header">
+                        <span class="message-sender">${sender}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-text">${escapeHtml(message)}</div>
                 </div>
             `;
-
-            return card;
+            
+            messagesArea.appendChild(messageDiv);
         }
 
-        // Format File Size
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
-        // Event Listeners
-        passwordInput.addEventListener('input', checkPassword);
-        passwordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') uploadFile();
-        });
+        function scrollToBottom() {
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
 
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files[0] && !isPasswordCorrect) {
-                checkPassword();
-            }
+        // Auto-scroll on new messages
+        const observer = new MutationObserver(() => {
+            scrollToBottom();
         });
-
-        // Load documents when Firebase is ready
-        window.addEventListener('load', () => {
-            setTimeout(loadDocuments, 1000);
-        });
-
-        // Auto-refresh every 30 seconds
-        setInterval(loadDocuments, 30000);
+        observer.observe(messagesArea, { childList: true });
     </script>
 </body>
 </html>
